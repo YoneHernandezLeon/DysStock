@@ -19,13 +19,13 @@ function Header() {
         {
           label: "Nueva salida",
           command: () => {
-            navigate("/");
+            navigate("/withdraw/new");
           },
         },
         {
           label: "Ver salidas",
           command: () => {
-            navigate("/test");
+            navigate("/withdraw");
           },
         },
       ],
@@ -38,7 +38,7 @@ function Header() {
           label: "Repuestos/Mod.",
         },
         {
-          label: "Alta rep.",
+          label: "Alta de repuesto",
         },
         {
           label: "Ubicaciones",
