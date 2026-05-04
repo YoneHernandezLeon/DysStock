@@ -93,7 +93,7 @@ function Header() {
     <div className="w-full">
       <Menubar
         model={items}
-        className="text-sm h-3rem w-6 mx-auto justify-content-center bg-primary"
+        className="text-sm h-3rem w-6 mx-auto justify-content-center bg-primary shadow-4"
       />
     </div>
   );

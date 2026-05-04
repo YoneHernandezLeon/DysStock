@@ -17,6 +17,65 @@
   }
 }
 
+.p-datatable-row-expansion {
+  background: rgb(240, 240, 240) !important
+}
+
+.scroll-hidden .p-virtualscroller {
+  overflow: hidden !important;
+}
+
+.compact-table .p-paginator {
+  font-size: 12px !important;
+  min-width: 24px !important;
+  height: 35px !important;
+  line-height: 0px !important;
+  padding-top: 0px;
+  background: rgb(227, 233, 253);
+}
+
+.compact-table .p-paginator .p-paginator-page,
+.compact-table .p-paginator .p-paginator-next,
+.compact-table .p-paginator .p-paginator-prev,
+.compact-table .p-paginator .p-paginator-first,
+.compact-table .p-paginator .p-paginator-last,
+.compact-table .p-paginator .p-dropdown,
+.compact-table .p-paginator .p-dropdown-label{
+  padding: 2px 6px !important;
+  min-width: 32px !important;
+  height: 30px !important;
+  line-height: 15px !important;
+  font-size: small;
+}
+
+.compact-table .p-row-toggler{
+  padding: 2px 6px !important;
+  min-width: 22px !important;
+  height: 20px !important;
+  line-height: 15px !important;
+  font-size: small;
+}
+
+.compact-table .p-paginator .p-dropdown {
+  height: 24px !important;
+}
+
+.compact-table .p-datatable-header,
+.compact-table .p-datatable-footer {
+    background-color: rgb(61, 42, 143);
+    color: rgb(255, 255, 255);
+    opacity: 1;
+    transition: background-color .3s;
+}
+
+.basic-panel {
+  background-color: white;
+}
+
+.item-panel {
+  background-color: rgba(2, 0, 110, 0.13);
+}
+
 .hero {
   position: relative;
 
@@ -181,4 +240,12 @@
     right: 0;
     border-right-color: var(--border);
   }
+}
+
+:root{
+  background-image: url('assets/dysteca.jpg');
+  background-repeat: no-repeat;
+  background-size: 80%;
+  background-position: center;
+  background-attachment: fixed;
 }
