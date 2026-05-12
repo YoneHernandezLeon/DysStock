@@ -60,12 +60,14 @@
   height: 24px !important;
 }
 
-.compact-table .p-datatable-header,
-.compact-table .p-datatable-footer {
-    background-color: rgb(61, 42, 143);
-    color: rgb(255, 255, 255);
-    opacity: 1;
-    transition: background-color .3s;
+.withdrawal {
+  .compact-table .p-datatable-header,
+  .compact-table .p-datatable-footer {
+      background-color: rgb(61, 42, 143);
+      color: rgb(255, 255, 255);
+      opacity: 1;
+      transition: background-color .3s;
+  }
 }
 
 .basic-panel {
