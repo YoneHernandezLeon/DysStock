@@ -1,6 +1,7 @@
 import axios from "axios";
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
+import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import {
   DataTable,
   type DataTableExpandedRows,
@@ -8,15 +9,19 @@ import {
   type DataTableValueArray,
 } from "primereact/datatable";
 import { Dialog } from "primereact/dialog";
-import { useEffect, useState } from "react";
-import NewWithdrawalPanel from "../../components/NewWIthdrawalPanel";
+import { useEffect, useRef, useState } from "react";
+import NewWithdrawalPanel from "./components/NewWIthdrawalPanel";
+import { Toast } from "primereact/toast";
 
-function ListWithdraws() {
+function Withdrawals() {
   const [visible, setVisible] = useState<boolean>(false);
   const [withdrawals, setWithdrawals] = useState<DataTableValue[]>([]);
   const [expandedRows, setExpandedRows] = useState<
     DataTableExpandedRows | DataTableValueArray | undefined
   >(undefined);
+  const [refresh, setRefresh] = useState<boolean>(false);
+
+  const toast = useRef<Toast>(null);
 
   const header = (
     <div className="flex flex-wrap align-items-center justify-content-between gap-2">
@@ -38,19 +43,53 @@ function ListWithdraws() {
     </span>
   );
 
+  // You can customize this further based on your specific needs.
+  // For instance, you might want to add a delete button on the row:
+  const actionTemplate = (rowData: DataTableValue) => {
+    return (
+      <Button
+        icon="pi pi-trash"
+        size="small"
+        severity="danger"
+        text
+        onClick={() => {
+          deleteConfirmation(rowData.id);
+        }}
+      />
+    );
+  };
+
+  const deleteConfirmation = (id: number) => {
+    confirmDialog({
+      message: "¿Seguro que quieres eliminar esta línea?",
+      header: "Confirmación de eliminación",
+      icon: "pi pi-info-circle",
+      defaultFocus: "reject",
+      acceptClassName: "p-button-danger",
+      accept: () => deleteRow(id),
+      reject: () => {},
+    });
+  };
+
+  const deleteRow = (id: number) => {
+    console.log(id);
+  };
+
   const rowExpansionTemplate = (data: DataTableValue) => {
     return (
       <div>
         <DataTable
-          value={data.lineas}
+          value={data.lines}
           size="small"
           className="text-xs p-1"
           id="expanded-row"
         >
-          <Column field="numlinea" header="Linea"></Column>
-          <Column field="cantidad" header="Cantidad"></Column>
-          <Column field="referencia" header="Referencia"></Column>
-          <Column field="producto" header="Producto"></Column>
+          <Column field="id"></Column>
+          <Column field="reference_code" header="Referencia"></Column>
+          <Column field="description" header="Producto"></Column>
+          <Column field="quantity" header="Cantidad"></Column>
+          <Column field="location" header="Ubicación"></Column>
+          <Column body={actionTemplate} />
         </DataTable>
       </div>
     );
@@ -61,11 +100,23 @@ function ListWithdraws() {
       .get("http://localhost:8000/api/withdrawals/")
       .then((res) => {
         setWithdrawals(res.data);
+        console.log(res.data);
       })
       .catch((err) => {
         console.error(err);
       });
-  }, []);
+  }, [refresh]);
+
+  const closeDialog: CallableFunction = () => {
+    setVisible(false);
+    toast.current?.show({
+      severity: "success",
+      summary: "¡Hecho!",
+      detail: "Se ha creado la salida correctamente",
+      life: 3000,
+    });
+    setRefresh(!refresh);
+  };
 
   return (
     <div className="basic-panel">
@@ -78,8 +129,10 @@ function ListWithdraws() {
           setVisible(false);
         }}
       >
-        <NewWithdrawalPanel />
+        <NewWithdrawalPanel updateDialog={closeDialog} />
       </Dialog>
+      <ConfirmDialog />
+      <Toast ref={toast} />
       <DataTable
         value={withdrawals}
         header={header}
@@ -100,12 +153,12 @@ function ListWithdraws() {
         rowExpansionTemplate={rowExpansionTemplate}
       >
         <Column expander={true} style={{ width: "5rem" }} />
-        <Column field="codfactura" header="Código" />
-        <Column field="cliente" header="Técnico" />
-        <Column field="fecha" header="Fecha" />
+        <Column field="id" header="Código" />
+        <Column field="worker" header="Técnico" />
+        <Column field="date" header="Fecha" />
       </DataTable>
     </div>
   );
 }
 
-export default ListWithdraws;
+export default Withdrawals;

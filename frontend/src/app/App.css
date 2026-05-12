@@ -76,6 +76,11 @@
   background-color: rgba(2, 0, 110, 0.13);
 }
 
+.p-inputgroup-addon {
+  background-color: rgb(215, 220, 241);
+  color: grey;
+}
+
 .hero {
   position: relative;
 
@@ -243,7 +248,7 @@
 }
 
 :root{
-  background-image: url('assets/dysteca.jpg');
+  background-image: url('../assets/dysteca.jpg');
   background-repeat: no-repeat;
   background-size: 80%;
   background-position: center;

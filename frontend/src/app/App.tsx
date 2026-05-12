@@ -2,11 +2,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
 import { PrimeReactProvider } from "primereact/api";
 import "primeicons/primeicons.css";
-import "../node_modules/primeflex/primeflex.css";
-import Layout from "./layouts/MainLayout";
-import Index from "./pages/Index";
-import ListWithdraws from "./pages/Withdraws/ListWithdraws";
-import NewWithdraw from "./pages/Withdraws/NewWithdraw";
+import "../../node_modules/primeflex/primeflex.css";
+import Layout from "../layouts/MainLayout";
+import Index from "../features/main";
+import Withdrawals from "../features/withdrawals";
 
 function App() {
   return (
@@ -17,8 +16,7 @@ function App() {
             <Route path="/" element={<Layout />}>
               <Route index element={<Index />} />
               <Route path="withdraw/">
-                <Route index element={<ListWithdraws />} />
-                <Route path="new/" element={<NewWithdraw />} />
+                <Route index element={<Withdrawals />} />
               </Route>
             </Route>
           </Routes>

@@ -15,20 +15,9 @@ function Header() {
     {
       label: "Salidas",
       icon: "pi pi-file-export",
-      items: [
-        {
-          label: "Nueva salida",
-          command: () => {
-            navigate("/withdraw/new");
-          },
-        },
-        {
-          label: "Ver salidas",
-          command: () => {
-            navigate("/withdraw");
-          },
-        },
-      ],
+      command: () => {
+        navigate("/withdraw");
+      },
     },
     {
       label: "Almacen",
