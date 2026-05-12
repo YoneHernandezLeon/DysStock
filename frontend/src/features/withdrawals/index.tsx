@@ -11,7 +11,7 @@ import { Dialog } from "primereact/dialog";
 import { useEffect, useRef, useState } from "react";
 import NewWithdrawalPanel from "./components/NewWIthdrawalPanel";
 import { Toast } from "primereact/toast";
-import { getWithdrawals } from "../../api/api";
+import { deleteWithdrawalLine, getWithdrawals } from "../../api/api";
 
 function Withdrawals() {
   const [visible, setVisible] = useState<boolean>(false);
@@ -37,6 +37,7 @@ function Withdrawals() {
       />
     </div>
   );
+
   const footer = (
     <span className="font-italic font-light">
       Se han encontrado {withdrawals ? withdrawals.length : 0} salidas.
@@ -71,8 +72,14 @@ function Withdrawals() {
     });
   };
 
-  const deleteRow = (id: number) => {
-    console.log(id);
+  const deleteRow = async (id: number) => {
+    try {
+      const data = await deleteWithdrawalLine(id);
+      console.log(data);
+      setRefresh(!refresh);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const rowExpansionTemplate = (data: DataTableValue) => {

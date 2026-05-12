@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework import status
 from .models import Withdrawal, WithdrawalLine, Item, Worker
 from .serializers import (
     AddWithdrawalSerializer,
@@ -10,8 +11,8 @@ from .serializers import (
 )
 
 
-@api_view(["GET", "POST"])
-def manage_withdrawals(request):
+@api_view(["GET", "POST", "DELETE"])
+def manage_withdrawals(request, pk=-1):
     if request.method == "GET":
         withdrawals = Withdrawal.objects.values("id", "date", "worker_id").order_by(
             "-id"
@@ -100,6 +101,33 @@ def manage_withdrawals(request):
             return Response("OK")
 
         return Response("OK", status=404)
+
+    elif request.method == "DELETE":
+        try:
+            line = WithdrawalLine.objects.get(id=pk)
+
+            item = Item.objects.get(id=line.item_id)
+            item.stock += line.quantity
+
+            item.save()
+
+            withdrawal_id = line.withdrawal_id
+
+            line.delete()
+
+            if len(WithdrawalLine.objects.filter(withdrawal_id=withdrawal_id)) == 0:
+                withdrawal = Withdrawal.objects.get(id=withdrawal_id)
+                withdrawal.delete()
+
+            return Response(
+                {"message": "Eliminado correctamente"},
+                status=status.HTTP_204_NO_CONTENT,
+            )
+
+        except WithdrawalLine.DoesNotExist:
+            return Response(
+                {"error": "No se encontró la linea"}, status=status.HTTP_404_NOT_FOUND
+            )
 
 
 @api_view(["GET"])

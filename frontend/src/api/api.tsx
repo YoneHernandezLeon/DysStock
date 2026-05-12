@@ -22,3 +22,8 @@ export const createWithdrawal = async (data: Withdrawal) => {
   const response = await axios.post(`${BASE_URL}withdrawals/`, data);
   return response.data;
 };
+
+export const deleteWithdrawalLine = async (id: number) => {
+  const response = await axios.delete(`${BASE_URL}withdrawals/${id}/`);
+  return response.data;
+};
