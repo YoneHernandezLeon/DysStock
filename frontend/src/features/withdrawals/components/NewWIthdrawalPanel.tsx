@@ -1,4 +1,3 @@
-import axios from "axios";
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import { Column } from "primereact/column";
@@ -12,31 +11,13 @@ import {
 import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
 import { useEffect, useState } from "react";
-
-interface Worker {
-  id: number;
-  code: number;
-  name: string;
-}
-
-interface Item {
-  id: number;
-  reference_code: string;
-  description: string;
-  stock: number;
-  safety_stock: number;
-}
-
-interface SelectedItem {
-  id: number;
-  reference_code: string;
-  description: string;
-  quantity: number;
-}
-
-interface Props {
-  updateDialog: CallableFunction;
-}
+import { createWithdrawal, getItems, getWorkers } from "../../../api/api";
+import type {
+  Item,
+  Props,
+  SelectedItem,
+  Worker,
+} from "../../../types/withdrawals";
 
 function NewWithdrawalPanel(props: Props) {
   const [quantity, setQuantity] = useState<number>(0);
@@ -65,23 +46,21 @@ function NewWithdrawalPanel(props: Props) {
   };
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8000/api/workers/")
-      .then((res) => {
-        setWorkers(res.data);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    const fetchData = async () => {
+      try {
+        const [workersData, itemsData] = await Promise.all([
+          getWorkers(),
+          getItems(),
+        ]);
 
-    axios
-      .get("http://localhost:8000/api/items/")
-      .then((res) => {
-        setItems(res.data);
-      })
-      .catch((err) => {
+        setWorkers(workersData);
+        setItems(itemsData);
+      } catch (err) {
         console.error(err);
-      });
+      }
+    };
+
+    fetchData();
   }, []);
 
   const selectWorker = (e: DropdownChangeEvent) => {
@@ -89,7 +68,7 @@ function NewWithdrawalPanel(props: Props) {
     resetArticleForm();
   };
 
-  const resetArticleForm = (fullReset: boolean = true) => {
+  const resetArticleForm = async (fullReset: boolean = true) => {
     setSelectedItem(null);
     setDescription("");
     setActualStock(0);
@@ -102,14 +81,12 @@ function NewWithdrawalPanel(props: Props) {
       setWithdrawalList([]);
       setDisabledWithdrawButton(true);
 
-      axios
-        .get("http://localhost:8000/api/items/")
-        .then((res) => {
-          setItems(res.data);
-        })
-        .catch((err) => {
-          console.error(err);
-        });
+      try {
+        const data = await getItems();
+        setItems(data);
+      } catch (err) {
+        console.error(err);
+      }
     }
   };
 
@@ -194,17 +171,19 @@ function NewWithdrawalPanel(props: Props) {
     resetArticleForm(false);
   };
 
-  const withdraw = () => {
-    axios({
-      method: "POST",
-      url: "http://localhost:8000/api/withdrawals/",
-      data: { worker: selectedWorker?.id, lines: withdrawalList },
-    })
-      .then((res) => console.log(res))
-      .catch((err) => {
-        console.error(err);
+  const withdraw = async () => {
+    try {
+      const data = await createWithdrawal({
+        worker: selectedWorker?.id as number,
+        lines: withdrawalList,
       });
-    props.updateDialog();
+
+      console.log(data);
+
+      props.updateDialog();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (

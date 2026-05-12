@@ -1,4 +1,3 @@
-import axios from "axios";
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
@@ -12,6 +11,7 @@ import { Dialog } from "primereact/dialog";
 import { useEffect, useRef, useState } from "react";
 import NewWithdrawalPanel from "./components/NewWIthdrawalPanel";
 import { Toast } from "primereact/toast";
+import { getWithdrawals } from "../../api/api";
 
 function Withdrawals() {
   const [visible, setVisible] = useState<boolean>(false);
@@ -96,15 +96,17 @@ function Withdrawals() {
   };
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8000/api/withdrawals/")
-      .then((res) => {
-        setWithdrawals(res.data);
-        console.log(res.data);
-      })
-      .catch((err) => {
+    const fetchWithdrawals = async () => {
+      try {
+        const data = await getWithdrawals();
+        setWithdrawals(data);
+        console.log(data);
+      } catch (err) {
         console.error(err);
-      });
+      }
+    };
+
+    fetchWithdrawals();
   }, [refresh]);
 
   const closeDialog: CallableFunction = () => {
