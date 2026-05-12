@@ -6,6 +6,7 @@ import "../../node_modules/primeflex/primeflex.css";
 import Layout from "../layouts/MainLayout";
 import Index from "../features/main";
 import Withdrawals from "../features/withdrawals";
+import Items from "../features/items";
 
 function App() {
   return (
@@ -15,9 +16,8 @@ function App() {
           <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<Index />} />
-              <Route path="withdraw/">
-                <Route index element={<Withdrawals />} />
-              </Route>
+              <Route path="withdraw/" element={<Withdrawals />} />
+              <Route path="items/" element={<Items />} />
             </Route>
           </Routes>
         </BrowserRouter>

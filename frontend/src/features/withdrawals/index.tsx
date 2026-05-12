@@ -76,6 +76,12 @@ function Withdrawals() {
     try {
       const data = await deleteWithdrawalLine(id);
       console.log(data);
+      toast.current?.show({
+        severity: "success",
+        summary: "¡Hecho!",
+        detail: "Se ha eliminado la linea correctamente",
+        life: 3000,
+      });
       setRefresh(!refresh);
     } catch (err) {
       console.error(err);
@@ -128,7 +134,7 @@ function Withdrawals() {
   };
 
   return (
-    <div className="basic-panel">
+    <div className="basic-panel withdrawal">
       <Dialog
         header="Nueva salida"
         visible={visible}

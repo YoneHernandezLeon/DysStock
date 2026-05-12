@@ -25,6 +25,10 @@ function Header() {
       items: [
         {
           label: "Repuestos/Mod.",
+          icon: "pi pi-wrench",
+          command: () => {
+            navigate("/items");
+          },
         },
         {
           label: "Alta de repuesto",

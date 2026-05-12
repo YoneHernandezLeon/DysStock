@@ -134,7 +134,7 @@ function Withdrawals() {
   };
 
   return (
-    <div className="basic-panel">
+    <div className="basic-panel withdrawal">
       <Dialog
         header="Nueva salida"
         visible={visible}
