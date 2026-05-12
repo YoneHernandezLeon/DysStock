@@ -1,28 +1,41 @@
 from rest_framework import serializers
-from .models import Clientes, Articulos
+from .models import Worker, Item
 
 
-class FactulineaSerializer(serializers.Serializer):
-    numlinea = serializers.IntegerField()
-    producto = serializers.CharField()
-    referencia = serializers.CharField()
-    cantidad = serializers.IntegerField()
+class WithdrawalLineSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    description = serializers.CharField()
+    reference_code = serializers.CharField()
+    location = serializers.CharField()
+    quantity = serializers.IntegerField()
 
 
-class FacturasSerializer(serializers.Serializer):
-    codfactura = serializers.IntegerField()
-    cliente = serializers.CharField()
-    fecha = serializers.DateField(format="%d-%m-%Y")
-    lineas = FactulineaSerializer(many=True)
+class WithdrawalSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    worker = serializers.CharField()
+    date = serializers.DateField(format="%d-%m-%Y")
+    lines = WithdrawalLineSerializer(many=True)
 
 
-class ClienteSerializer(serializers.ModelSerializer):
+class WorkerSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Clientes
-        fields = ['codcliente', 'nombre']
+        model = Worker
+        fields = ["id", "code", "name"]
 
 
-class ArticulosSerializer(serializers.ModelSerializer):
+class ItemSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Articulos
-        fields = ['codarticulo', 'referencia', 'descripcion', 'stock', 'stock_minimo']
+        model = Item
+        fields = ["id", "reference_code", "description", "stock", "safety_stock"]
+
+
+class AddWithdrawalLineSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    reference_code = serializers.CharField()
+    description = serializers.CharField()
+    quantity = serializers.IntegerField()
+
+
+class AddWithdrawalSerializer(serializers.Serializer):
+    worker = serializers.IntegerField()
+    lines = AddWithdrawalLineSerializer(many=True)

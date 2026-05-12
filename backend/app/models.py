@@ -1,363 +1,72 @@
 from django.db import models
 
 
-class Albalinea(models.Model):
-    id = models.AutoField(primary_key=True)
-    codalbaran = models.IntegerField()
-    numlinea = models.IntegerField()
-    codfamilia = models.IntegerField(blank=True, null=True)
-    codigo = models.CharField(max_length=15, db_collation='utf8mb3_general_ci', blank=True, null=True)
-    cantidad = models.FloatField()
-    precio = models.FloatField()
-    importe = models.FloatField()
-    dcto = models.IntegerField()
+class Worker(models.Model):
+    code = models.IntegerField(verbose_name="Código", unique=True)
+    name = models.CharField(verbose_name="Nombre", max_length=50)
+
+    def __str__(self):
+        return str(self.code) + " - " + self.name
 
     class Meta:
-        managed = False
-        db_table = 'albalinea'
-        unique_together = ('codalbaran', 'numlinea')
+        verbose_name = "Empleado"
+        verbose_name_plural = "Empleados"
 
 
-class Albaranes(models.Model):
-    codalbaran = models.AutoField(primary_key=True)
-    codfactura = models.IntegerField()
-    fecha = models.DateField()
-    iva = models.IntegerField()
-    codcliente = models.IntegerField(blank=True, null=True)
-    estado = models.CharField(max_length=1, db_collation='utf8mb3_general_ci', blank=True, null=True)
-    totalalbaran = models.FloatField()
-    borrado = models.CharField(max_length=1)
+class Location(models.Model):
+    code = models.CharField(verbose_name="Código", unique=True, max_length=15)
+
+    def __str__(self):
+        return self.code
 
     class Meta:
-        managed = False
-        db_table = 'albaranes'
+        verbose_name = "Ubicación"
+        verbose_name_plural = "Ubicaciones"
 
 
-class Albaranesp(models.Model):
-    pk = models.CompositePrimaryKey('codalbaran', 'codproveedor')
-    codalbaran = models.CharField(max_length=20)
-    codproveedor = models.IntegerField()
-    codfactura = models.CharField(max_length=20, blank=True, null=True)
-    fecha = models.DateField()
-    iva = models.IntegerField()
-    estado = models.CharField(max_length=1, blank=True, null=True)
-    totalalbaran = models.FloatField()
+class Item(models.Model):
+    reference_code = models.CharField(
+        verbose_name="Referencia", unique=True, max_length=20
+    )
+    description = models.CharField(verbose_name="Descripción", max_length=150)
+    location = models.ForeignKey(
+        Location, verbose_name="Ubicación", on_delete=models.CASCADE, null=True
+    )
+    stock = models.IntegerField(verbose_name="Stock", default=0)
+    safety_stock = models.IntegerField(verbose_name="Stock bajo mínimos", default=0)
+    safety_warning = models.BooleanField(
+        verbose_name="Aviso de stock bajo mínimos", default="True"
+    )
+    observations = models.CharField(
+        verbose_name="Observaciones", max_length=300, blank=True, null=True
+    )
 
-    class Meta:
-        managed = False
-        db_table = 'albaranesp'
-
-
-class Albaranesptmp(models.Model):
-    codalbaran = models.AutoField(primary_key=True)
-    fecha = models.DateField()
-
-    class Meta:
-        managed = False
-        db_table = 'albaranesptmp'
-        db_table_comment = 'Temporal de albaranes de proveedores para controlar acceso s'
-
-
-class Albaranestmp(models.Model):
-    codalbaran = models.AutoField(primary_key=True)
-    fecha = models.DateField()
+    def __str__(self):
+        return self.reference_code + " - " + self.description
 
     class Meta:
-        managed = False
-        db_table = 'albaranestmp'
-        db_table_comment = 'Temporal de albaranes para controlar acceso simultaneo'
+        verbose_name = "Artículo"
+        verbose_name_plural = "Artículos"
 
 
-class Articulos(models.Model):
-    codarticulo = models.AutoField(primary_key=True)
-    codfamilia = models.IntegerField()
-    referencia = models.CharField(max_length=20)
-    descripcion = models.TextField()
-    impuesto = models.FloatField()
-    codproveedor1 = models.IntegerField()
-    codproveedor2 = models.IntegerField()
-    descripcion_corta = models.CharField(max_length=30)
-    codubicacion = models.IntegerField()
-    stock = models.IntegerField()
-    stock_minimo = models.IntegerField()
-    aviso_minimo = models.CharField(max_length=1)
-    datos_producto = models.CharField(max_length=200)
-    fecha_alta = models.DateField()
-    codembalaje = models.IntegerField()
-    unidades_caja = models.IntegerField()
-    precio_ticket = models.CharField(max_length=1)
-    modificar_ticket = models.CharField(max_length=1)
-    observaciones = models.TextField()
-    precio_compra = models.FloatField(blank=True, null=True)
-    precio_almacen = models.FloatField(blank=True, null=True)
-    precio_tienda = models.FloatField(blank=True, null=True)
-    precio_pvp = models.FloatField(blank=True, null=True)
-    precio_iva = models.FloatField(blank=True, null=True)
-    codigobarras = models.CharField(max_length=15)
-    imagen = models.CharField(max_length=200)
-    borrado = models.CharField(max_length=1)
+class Withdrawal(models.Model):
+    date = models.DateField(verbose_name="Fecha de salida", auto_now_add=True)
+    worker = models.ForeignKey(
+        Worker, verbose_name="Empleado", on_delete=models.CASCADE
+    )
 
     class Meta:
-        managed = False
-        db_table = 'articulos'
-        db_table_comment = 'Articulos'
+        verbose_name = "Salida"
+        verbose_name_plural = "Salidas"
 
 
-class Artpro(models.Model):
-    pk = models.CompositePrimaryKey('codarticulo', 'codfamilia', 'codproveedor')
-    codarticulo = models.CharField(max_length=15)
-    codfamilia = models.IntegerField()
-    codproveedor = models.IntegerField()
-    precio = models.FloatField()
-
-    class Meta:
-        managed = False
-        db_table = 'artpro'
-
-
-class Clientes(models.Model):
-    codcliente = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=45)
-    nif = models.CharField(max_length=12)
-    direccion = models.CharField(max_length=50)
-    codprovincia = models.IntegerField()
-    localidad = models.CharField(max_length=35)
-    codformapago = models.IntegerField()
-    codentidad = models.IntegerField()
-    cuentabancaria = models.CharField(max_length=20)
-    codpostal = models.CharField(max_length=5)
-    telefono = models.CharField(max_length=14)
-    movil = models.CharField(max_length=14)
-    email = models.CharField(max_length=35)
-    web = models.CharField(max_length=45)
-    borrado = models.CharField(max_length=1)
+class WithdrawalLine(models.Model):
+    withdrawal = models.ForeignKey(
+        Withdrawal, verbose_name="Salida", on_delete=models.CASCADE
+    )
+    item = models.ForeignKey(Item, verbose_name="Artículo", on_delete=models.CASCADE)
+    quantity = models.IntegerField(verbose_name="Cantidad")
 
     class Meta:
-        managed = False
-        db_table = 'clientes'
-        db_table_comment = 'Clientes'
-
-
-class Cobros(models.Model):
-    codfactura = models.IntegerField()
-    codcliente = models.IntegerField()
-    importe = models.FloatField()
-    codformapago = models.IntegerField()
-    numdocumento = models.CharField(max_length=30)
-    fechacobro = models.DateField()
-    observaciones = models.TextField()
-
-    class Meta:
-        managed = False
-        db_table = 'cobros'
-        db_table_comment = 'Cobros de facturas a clientes'
-
-
-class Embalajes(models.Model):
-    codembalaje = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=30, blank=True, null=True)
-    borrado = models.CharField(max_length=1)
-
-    class Meta:
-        managed = False
-        db_table = 'embalajes'
-        db_table_comment = 'Embalajes'
-
-
-class Entidades(models.Model):
-    codentidad = models.AutoField(primary_key=True)
-    nombreentidad = models.CharField(max_length=50)
-    borrado = models.CharField(max_length=1)
-
-    class Meta:
-        managed = False
-        db_table = 'entidades'
-        db_table_comment = 'Entidades Bancarias'
-
-
-class Factulinea(models.Model):
-    codfactura = models.IntegerField()
-    numlinea = models.IntegerField()
-    codfamilia = models.IntegerField()
-    codigo = models.CharField(max_length=15)
-    cantidad = models.FloatField()
-    precio = models.FloatField()
-    importe = models.FloatField()
-    dcto = models.IntegerField()
-
-    class Meta:
-        managed = False
-        db_table = 'factulinea'
-        db_table_comment = 'lineas de facturas a clientes'
-        unique_together = ('codfactura', 'numlinea')
-
-
-class Facturas(models.Model):
-    codfactura = models.AutoField(primary_key=True)
-    fecha = models.DateField()
-    iva = models.IntegerField()
-    codcliente = models.IntegerField()
-    estado = models.CharField(max_length=1)
-    totalfactura = models.FloatField()
-    fechavencimiento = models.DateField()
-    borrado = models.CharField(max_length=1)
-
-    class Meta:
-        managed = False
-        db_table = 'facturas'
-        db_table_comment = 'facturas de ventas a clientes'
-
-
-class Facturasp(models.Model):
-    pk = models.CompositePrimaryKey('codfactura', 'codproveedor')
-    codfactura = models.CharField(max_length=20)
-    codproveedor = models.IntegerField()
-    fecha = models.DateField()
-    iva = models.IntegerField()
-    estado = models.CharField(max_length=1)
-    totalfactura = models.FloatField()
-    fechapago = models.DateField()
-    borrado = models.CharField(max_length=1)
-
-    class Meta:
-        managed = False
-        db_table = 'facturasp'
-        db_table_comment = 'facturas de compras a proveedores'
-
-
-class Facturasptmp(models.Model):
-    codfactura = models.AutoField(primary_key=True)
-    fecha = models.DateField()
-
-    class Meta:
-        managed = False
-        db_table = 'facturasptmp'
-        db_table_comment = 'temporal de facturas de proveedores'
-
-
-class Facturastmp(models.Model):
-    codfactura = models.AutoField(primary_key=True)
-    fecha = models.DateField()
-
-    class Meta:
-        managed = False
-        db_table = 'facturastmp'
-        db_table_comment = 'temporal de facturas a clientes'
-
-
-class Familias(models.Model):
-    codfamilia = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=20, blank=True, null=True)
-    borrado = models.CharField(max_length=1)
-
-    class Meta:
-        managed = False
-        db_table = 'familias'
-        db_table_comment = 'familia de articulos'
-
-
-class Formapago(models.Model):
-    codformapago = models.AutoField(primary_key=True)
-    nombrefp = models.CharField(max_length=40)
-    borrado = models.CharField(max_length=1)
-
-    class Meta:
-        managed = False
-        db_table = 'formapago'
-        db_table_comment = 'Forma de pago'
-
-
-class Impuestos(models.Model):
-    codimpuesto = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=20, blank=True, null=True)
-    valor = models.FloatField()
-    borrado = models.CharField(max_length=1)
-
-    class Meta:
-        managed = False
-        db_table = 'impuestos'
-        db_table_comment = 'tipos de impuestos'
-
-
-class Librodiario(models.Model):
-    fecha = models.DateField()
-    tipodocumento = models.CharField(max_length=1)
-    coddocumento = models.CharField(max_length=20)
-    codcomercial = models.IntegerField()
-    codformapago = models.IntegerField()
-    numpago = models.CharField(max_length=30)
-    total = models.FloatField()
-
-    class Meta:
-        managed = False
-        db_table = 'librodiario'
-        db_table_comment = 'Movimientos diarios'
-
-
-class Pagos(models.Model):
-    codfactura = models.CharField(max_length=20)
-    codproveedor = models.IntegerField()
-    importe = models.FloatField()
-    codformapago = models.IntegerField()
-    numdocumento = models.CharField(max_length=30)
-    fechapago = models.DateField(blank=True, null=True)
-    observaciones = models.TextField()
-
-    class Meta:
-        managed = False
-        db_table = 'pagos'
-        db_table_comment = 'Pagos de facturas a proveedores'
-
-
-class Proveedores(models.Model):
-    codproveedor = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=45)
-    nif = models.CharField(max_length=12)
-    direccion = models.CharField(max_length=50)
-    codprovincia = models.IntegerField()
-    localidad = models.CharField(max_length=35)
-    codentidad = models.IntegerField()
-    cuentabancaria = models.CharField(max_length=20)
-    codpostal = models.CharField(max_length=5)
-    telefono = models.CharField(max_length=14)
-    movil = models.CharField(max_length=14)
-    email = models.CharField(max_length=35)
-    web = models.CharField(max_length=45)
-    borrado = models.CharField(max_length=1)
-
-    class Meta:
-        managed = False
-        db_table = 'proveedores'
-        db_table_comment = 'Proveedores'
-
-
-class Provincias(models.Model):
-    codprovincia = models.AutoField(primary_key=True)
-    nombreprovincia = models.CharField(max_length=40)
-
-    class Meta:
-        managed = False
-        db_table = 'provincias'
-        db_table_comment = 'Provincias'
-
-
-class Tabbackup(models.Model):
-    denominacion = models.CharField(max_length=50, db_collation='utf8mb3_unicode_ci')
-    fecha = models.DateField()
-    hora = models.TimeField()
-    archivo = models.CharField(max_length=40, db_collation='utf8mb3_unicode_ci')
-
-    class Meta:
-        managed = False
-        db_table = 'tabbackup'
-
-
-class Ubicaciones(models.Model):
-    codubicacion = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=50)
-    borrado = models.CharField(max_length=1)
-
-    class Meta:
-        managed = False
-        db_table = 'ubicaciones'
-        db_table_comment = 'Ubicaciones'
+        verbose_name = "Linea de salida"
+        verbose_name_plural = "Lineas de salida"

@@ -1,82 +1,123 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Facturas, Factulinea, Articulos, Clientes
-from .serializers import FacturasSerializer, ClienteSerializer, ArticulosSerializer
+from .models import Withdrawal, WithdrawalLine, Item, Worker
+from .serializers import (
+    AddWithdrawalSerializer,
+    WithdrawalSerializer,
+    WorkerSerializer,
+    ItemSerializer,
+)
 
-@api_view(['GET'])
-def get_withdrawals(request):
-    withdrawals = Facturas.objects.values('codfactura', 'fecha', 'codcliente').order_by('-codfactura')
-    lines = Factulinea.objects.values('numlinea', 'codigo', 'cantidad', 'codfactura').order_by('codfactura', 'numlinea')
-    items = Articulos.objects.all()
-    workers = Clientes.objects.all()
-    
-    workers_dict = {
-        w.codcliente: {
-            "codcliente": w.codcliente,
-            "nombre": w.nombre
-        }
-        for w in workers
-    }
-    
-    items_dict = {
-        i.codarticulo: {
-            "producto": i.descripcion,
-            "referencia": i.referencia
-        }
-        for i in items
-    }
-    
-    lines_of_withdrawal = {}
-    
-    for line in lines:
-        try:
-            item = items_dict.get(int(line["codigo"]))
-        except ValueError:
-            continue
-        
-        if item is None: continue
-        
-        line_data = {
-            "numlinea": line["numlinea"],
-            "producto": item["producto"],
-            "referencia": item["referencia"],
-            "cantidad": line["cantidad"]
-        }
-        
-        lines_of_withdrawal.setdefault(line["codfactura"], []).append(line_data)
-        
-    data = []
-    
-    for withdrawal in withdrawals:
-        worker = workers_dict.get(int(withdrawal["codcliente"]))
-        
-        data.append({
-            "codfactura": withdrawal["codfactura"],
-            "cliente": worker["nombre"],
-            "fecha": withdrawal["fecha"],
-            "lineas": lines_of_withdrawal.get(withdrawal["codfactura"], [])
-        })
-        
-    serializer = FacturasSerializer(data, many=True)
 
-    return Response(serializer.data)
+@api_view(["GET", "POST"])
+def manage_withdrawals(request):
+    if request.method == "GET":
+        withdrawals = Withdrawal.objects.values("id", "date", "worker_id").order_by(
+            "-id"
+        )
+        lines = WithdrawalLine.objects.values(
+            "id", "item_id", "item__description", "quantity", "withdrawal_id"
+        ).order_by("withdrawal_id")
+        items = Item.objects.values(
+            "id", "description", "reference_code", "location__code"
+        )
+        workers = Worker.objects.all()
 
-@api_view(['GET'])
+        workers_dict = {w.id: {"id": w.id, "name": w.name} for w in workers}
+
+        items_dict = {
+            i["id"]: {
+                "item": i["description"],
+                "reference_code": i["reference_code"],
+                "location": i["location__code"],
+            }
+            for i in items
+        }
+
+        lines_of_withdrawal = {}
+
+        for line in lines:
+            try:
+                item = items_dict.get(int(line["item_id"]))
+            except ValueError:
+                continue
+
+            if item is None:
+                continue
+
+            line_data = {
+                "id": line["id"],
+                "description": line["item__description"],
+                "reference_code": item["reference_code"],
+                "location": item["location"],
+                "quantity": line["quantity"],
+            }
+
+            lines_of_withdrawal.setdefault(line["withdrawal_id"], []).append(line_data)
+
+        data = []
+
+        for withdrawal in withdrawals:
+            worker = workers_dict.get(int(withdrawal["worker_id"]))
+
+            data.append(
+                {
+                    "id": withdrawal["id"],
+                    "worker": worker["name"],
+                    "date": withdrawal["date"],
+                    "lines": lines_of_withdrawal.get(withdrawal["id"], []),
+                }
+            )
+
+        serializer = WithdrawalSerializer(data, many=True)
+
+        return Response(serializer.data)
+
+    elif request.method == "POST":
+        serializer = AddWithdrawalSerializer(data=request.data)
+
+        if serializer.is_valid():
+            withdrawal = Withdrawal.objects.create(
+                worker_id=serializer.validated_data["worker"]
+            )
+
+            for data in serializer.data["lines"]:
+                line = WithdrawalLine.objects.create(
+                    withdrawal_id=withdrawal.id,
+                    item_id=data["id"],
+                    quantity=data["quantity"],
+                )
+
+                articulo = Item.objects.get(id=data["id"])
+                articulo.stock = articulo.stock - data["quantity"]
+
+                line.save()
+                articulo.save(update_fields=["stock"])
+
+            withdrawal.save()
+
+            return Response("OK")
+
+        return Response("OK", status=404)
+
+
+@api_view(["GET"])
 def get_workers(request):
-    
-    workers = Clientes.objects.values('codcliente', 'nombre').order_by('codcliente')
-    
-    serializer = ClienteSerializer(workers, many=True)
-    
+
+    workers = Worker.objects.values("id", "code", "name").order_by("code")
+
+    serializer = WorkerSerializer(workers, many=True)
+
     return Response(serializer.data)
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 def get_items(request):
-    items = Articulos.objects.values('codarticulo', 'referencia', 'descripcion', 'stock', 'stock_minimo')
-    
-    serializer = ArticulosSerializer(items, many=True)
-    
+    items = Item.objects.values(
+        "id", "reference_code", "description", "stock", "safety_stock"
+    )
+
+    serializer = ItemSerializer(items, many=True)
+
     return Response(serializer.data)
-    
