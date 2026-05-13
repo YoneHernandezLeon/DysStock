@@ -130,6 +130,7 @@ function NewWithdrawalPanel(props: Props) {
       description: "",
       stock: 0,
       safety_stock: 0,
+      observations: "",
     };
 
     const existingItemId = list.findIndex(

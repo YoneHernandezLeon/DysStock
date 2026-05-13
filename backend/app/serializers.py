@@ -26,7 +26,14 @@ class WorkerSerializer(serializers.ModelSerializer):
 class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
-        fields = ["id", "reference_code", "description", "stock", "safety_stock"]
+        fields = [
+            "id",
+            "reference_code",
+            "description",
+            "stock",
+            "safety_stock",
+            "observations",
+        ]
 
 
 class AddWithdrawalLineSerializer(serializers.Serializer):

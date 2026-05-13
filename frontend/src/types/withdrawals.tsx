@@ -10,6 +10,7 @@ export interface Item {
   description: string;
   stock: number;
   safety_stock: number;
+  observations: string;
 }
 
 export interface SelectedItem {
