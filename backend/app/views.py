@@ -143,7 +143,13 @@ def get_workers(request):
 @api_view(["GET"])
 def get_items(request):
     items = Item.objects.values(
-        "id", "reference_code", "description", "stock", "safety_stock", "observations"
+        "id",
+        "reference_code",
+        "location__code",
+        "description",
+        "stock",
+        "safety_stock",
+        "observations",
     )
 
     serializer = ItemSerializer(items, many=True)

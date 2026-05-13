@@ -11,6 +11,7 @@ export interface Item {
   stock: number;
   safety_stock: number;
   observations: string;
+  location__code: string;
 }
 
 export interface SelectedItem {
@@ -18,6 +19,7 @@ export interface SelectedItem {
   reference_code: string;
   description: string;
   quantity: number;
+  location__code: string;
 }
 
 export interface Props {

@@ -24,12 +24,15 @@ class WorkerSerializer(serializers.ModelSerializer):
 
 
 class ItemSerializer(serializers.ModelSerializer):
+    location__code = serializers.CharField(read_only=True)
+
     class Meta:
         model = Item
         fields = [
             "id",
             "reference_code",
             "description",
+            "location__code",
             "stock",
             "safety_stock",
             "observations",

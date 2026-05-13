@@ -122,6 +122,7 @@ function NewWithdrawalPanel(props: Props) {
       reference_code: "",
       description: "",
       quantity: 0,
+      location__code: "",
     };
 
     const modifiedStock: Item = {
@@ -131,6 +132,7 @@ function NewWithdrawalPanel(props: Props) {
       stock: 0,
       safety_stock: 0,
       observations: "",
+      location__code: "",
     };
 
     const existingItemId = list.findIndex(
@@ -142,6 +144,7 @@ function NewWithdrawalPanel(props: Props) {
       item.reference_code = list[existingItemId].reference_code as string;
       item.description = list[existingItemId].description as string;
       item.quantity = list[existingItemId].quantity + quantity;
+      item.location__code = list[existingItemId].location__code as string;
 
       list.splice(existingItemId, 1);
     } else {
@@ -150,6 +153,7 @@ function NewWithdrawalPanel(props: Props) {
         reference_code: selectedItem?.reference_code as string,
         description: selectedItem?.description as string,
         quantity: quantity,
+        location__code: selectedItem?.location__code as string,
       };
     }
 
@@ -162,6 +166,7 @@ function NewWithdrawalPanel(props: Props) {
     modifiedStock.description = stocks[stockedItemId].description;
     modifiedStock.stock = stocks[stockedItemId].stock - quantity;
     modifiedStock.safety_stock = stocks[stockedItemId].safety_stock;
+    modifiedStock.location__code = stocks[stockedItemId].location__code;
 
     stocks.splice(stockedItemId, 1);
 
@@ -265,6 +270,7 @@ function NewWithdrawalPanel(props: Props) {
         >
           <Column field="reference_code" header="Referencia" />
           <Column field="description" header="Descripción" />
+          <Column field="location__code" header="Ubicación" />
           <Column field="quantity" header="Cantidad" />
         </DataTable>
       </Card>
