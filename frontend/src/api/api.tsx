@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { Withdrawal } from "../types/withdrawals";
+import type { StockIncrease, Withdrawal } from "../types/withdrawals";
 
 const BASE_URL = "http://localhost:8000/api/";
 
@@ -20,6 +20,16 @@ export const deleteWithdrawalLine = async (id: number) => {
 
 export const getItems = async () => {
   const response = await axios.get(`${BASE_URL}items/`);
+  return response.data;
+};
+
+export const getItemsUnderSafety = async () => {
+  const response = await axios.get(`${BASE_URL}items/safety/`);
+  return response.data;
+};
+
+export const updateStock = async (data: StockIncrease) => {
+  const response = await axios.post(`${BASE_URL}items/updateStock`, data);
   return response.data;
 };
 

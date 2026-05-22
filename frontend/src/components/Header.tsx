@@ -21,25 +21,10 @@ function Header() {
     },
     {
       label: "Almacen",
-      icon: "pi pi-warehouse",
-      items: [
-        {
-          label: "Repuestos/Mod.",
-          icon: "pi pi-wrench",
-          command: () => {
-            navigate("/items");
-          },
-        },
-        {
-          label: "Alta de repuesto",
-        },
-        {
-          label: "Ubicaciones",
-        },
-        {
-          label: "Técnicos",
-        },
-      ],
+      icon: "pi pi-wrench",
+      command: () => {
+        navigate("/items");
+      },
     },
     {
       label: "Listados",
@@ -57,28 +42,11 @@ function Header() {
       ],
     },
     {
-      label: "Mantenimiento",
-      icon: "pi pi-wrench",
-      items: [
-        {
-          label: "Almacenes",
-        },
-        {
-          label: "Entrada proveedores",
-        },
-      ],
-    },
-    {
-      label: "Copias de seguridad",
+      label: "Administración",
       icon: "pi pi-clock",
-      items: [
-        {
-          label: "Crear",
-        },
-        {
-          label: "Restaurar",
-        },
-      ],
+      command: () => {
+        window.location.href = "http://localhost:8000/admin";
+      },
     },
   ];
 
@@ -86,7 +54,7 @@ function Header() {
     <div className="w-full">
       <Menubar
         model={items}
-        className="text-sm h-3rem w-6 mx-auto justify-content-center bg-primary shadow-4"
+        className="text-sm h-3rem w-5 mx-auto justify-content-center bg-primary shadow-4"
       />
     </div>
   );

@@ -1,0 +1,46 @@
+services:
+
+  mysql_dev:
+    image: mysql:8
+    restart: always
+    env_file:
+      - .env.dev
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_dev_data:/var/lib/mysql
+
+  backend_dev:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+
+    volumes:
+      - ./backend:/app
+
+    env_file:
+      - .env.dev
+    
+    ports:
+      - "8000:8000"
+    
+    depends_on:
+      - mysql_dev
+  
+  frontend_dev:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    
+    ports:
+      - "5173:5173"
+    
+    depends_on:
+      - backend_dev
+
+volumes:
+  mysql_dev_data:

@@ -3,7 +3,7 @@ from .models import *
 
 
 class ItemAdmin(admin.ModelAdmin):
-    pass
+    search_fields = ("reference_code",)
 
 
 class WorkerAdmin(admin.ModelAdmin):

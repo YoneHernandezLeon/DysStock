@@ -1,9 +1,11 @@
 from django.shortcuts import render
+from django.db.models import F
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Withdrawal, WithdrawalLine, Item, Worker
 from .serializers import (
+    AddStockToItemSerializer,
     AddWithdrawalSerializer,
     WithdrawalSerializer,
     WorkerSerializer,
@@ -143,6 +145,42 @@ def get_workers(request):
 @api_view(["GET"])
 def get_items(request):
     items = Item.objects.values(
+        "id",
+        "reference_code",
+        "location__code",
+        "description",
+        "stock",
+        "safety_stock",
+        "observations",
+    )
+
+    serializer = ItemSerializer(items, many=True)
+
+    return Response(serializer.data)
+
+
+@api_view(["POST"])
+def update_stock(request):
+    serializer = AddStockToItemSerializer(data=request.data)
+
+    if serializer.is_valid():
+
+        item = Item.objects.get(reference_code=serializer.data["reference_code"])
+
+        item.stock = serializer.data["stock"] + item.stock
+
+        item.save()
+
+        return Response("OK")
+
+    return Response("NOT OK", status=404)
+
+
+@api_view(["GET"])
+def get_items_under_safety(request):
+    items = Item.objects.filter(
+        stock__lte=F("safety_stock"), safety_warning=True
+    ).values(
         "id",
         "reference_code",
         "location__code",

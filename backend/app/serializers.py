@@ -49,3 +49,8 @@ class AddWithdrawalLineSerializer(serializers.Serializer):
 class AddWithdrawalSerializer(serializers.Serializer):
     worker = serializers.IntegerField()
     lines = AddWithdrawalLineSerializer(many=True)
+
+
+class AddStockToItemSerializer(serializers.Serializer):
+    reference_code = serializers.CharField()
+    stock = serializers.IntegerField()

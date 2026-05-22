@@ -30,3 +30,8 @@ export interface Withdrawal {
   worker: number;
   lines: SelectedItem[];
 }
+
+export interface StockIncrease {
+  reference_code: string;
+  stock: number;
+}
