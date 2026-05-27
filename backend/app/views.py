@@ -80,6 +80,8 @@ def manage_withdrawals(request, pk=-1):
     elif request.method == "POST":
         serializer = AddWithdrawalSerializer(data=request.data)
 
+        safety_items = []
+
         if serializer.is_valid():
             withdrawal = Withdrawal.objects.create(
                 worker_id=serializer.validated_data["worker"]
@@ -92,15 +94,20 @@ def manage_withdrawals(request, pk=-1):
                     quantity=data["quantity"],
                 )
 
-                articulo = Item.objects.get(id=data["id"])
-                articulo.stock = articulo.stock - data["quantity"]
+                item = Item.objects.get(id=data["id"])
+                item.stock = item.stock - data["quantity"]
+
+                if item.safety_warning and item.stock <= item.safety_stock:
+                    safety_items.append(item)
 
                 line.save()
-                articulo.save(update_fields=["stock"])
+                item.save(update_fields=["stock"])
 
             withdrawal.save()
 
-            return Response("OK")
+            safety_serializer = ItemSerializer(safety_items, many=True)
+
+            return Response(safety_serializer.data)
 
         return Response("OK", status=404)
 

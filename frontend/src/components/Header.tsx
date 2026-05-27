@@ -45,7 +45,7 @@ function Header() {
       label: "Administración",
       icon: "pi pi-clock",
       command: () => {
-        window.location.href = "http://localhost:8000/admin";
+        window.location.href = "/admin/";
       },
     },
   ];

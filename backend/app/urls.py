@@ -13,6 +13,6 @@ urlpatterns = [
     path("withdrawals/<int:pk>/", manage_withdrawals),
     path("workers/", get_workers),
     path("items/", get_items),
-    path("items/safety", get_items_under_safety),
-    path("items/updateStock", update_stock),
+    path("items/safety/", get_items_under_safety),
+    path("items/updateStock/", update_stock),
 ]
