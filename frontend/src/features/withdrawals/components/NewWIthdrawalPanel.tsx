@@ -183,11 +183,11 @@ function NewWithdrawalPanel(props: Props) {
         worker: selectedWorker?.id as number,
         lines: withdrawalList,
       });
-      const safety_items: string[] = [];
+      const safetyItems: string[] = [];
       data.forEach((item: Item) => {
-        safety_items.push(`${item.reference_code} | ${item.description}`);
+        safetyItems.push(`${item.reference_code} | ${item.description}`);
       });
-      props.updateDialog(safety_items);
+      props.updateDialog(safetyItems);
     } catch (err) {
       console.error(err);
     }

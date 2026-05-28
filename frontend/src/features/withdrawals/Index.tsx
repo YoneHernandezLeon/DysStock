@@ -21,7 +21,8 @@ function Withdrawals() {
   >(undefined);
   const [refresh, setRefresh] = useState<boolean>(false);
 
-  const toast = useRef<Toast>(null);
+  const mainToast = useRef<Toast>(null);
+  const safetyToast = useRef<Toast>(null);
 
   const header = (
     <div className="flex flex-wrap align-items-center justify-content-between gap-2">
@@ -74,7 +75,7 @@ function Withdrawals() {
     try {
       const data = await deleteWithdrawalLine(id);
       console.log(data);
-      toast.current?.show({
+      mainToast.current?.show({
         severity: "success",
         summary: "¡Hecho!",
         detail: "Se ha eliminado la linea correctamente",
@@ -120,14 +121,24 @@ function Withdrawals() {
     fetchWithdrawals();
   }, [refresh]);
 
-  const closeDialog: CallableFunction = () => {
+  const closeDialog: CallableFunction = (data: string[]) => {
     setVisible(false);
-    toast.current?.show({
+    mainToast.current?.show({
       severity: "success",
       summary: "¡Hecho!",
       detail: "Se ha creado la salida correctamente",
       life: 3000,
     });
+    if (data.length != 0) {
+      data.forEach((item) => {
+        safetyToast.current?.show({
+          severity: "error",
+          summary: "¡Articulo bajo mínimos!",
+          detail: item,
+          sticky: true,
+        });
+      });
+    }
     setRefresh(!refresh);
   };
 
@@ -145,7 +156,8 @@ function Withdrawals() {
         <NewWithdrawalPanel updateDialog={closeDialog} />
       </Dialog>
       <ConfirmDialog />
-      <Toast ref={toast} />
+      <Toast ref={mainToast} />
+      <Toast ref={safetyToast} position="bottom-left" />
       <DataTable
         value={withdrawals}
         header={header}

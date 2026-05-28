@@ -22,21 +22,9 @@ function Items() {
     location__code: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
 
-  const toast = useRef<Toast>(null);
+  const mainToast = useRef<Toast>(null);
 
   useEffect(() => {
-    //try {
-    //        const [workersData, itemsData] = await Promise.all([
-    //          getWorkers(),
-    //          getItems(),
-    //        ]);
-    //
-    //        setWorkers(workersData);
-    //        setItems(itemsData);
-    //      } catch (err) {
-    //        console.error(err);
-    //      }
-    // CAMBIALO PARA AÑADIR STOCK BAJO MINIMO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     const fetchItems = async () => {
       try {
         const data = await getItems();
@@ -87,7 +75,7 @@ function Items() {
       setRefresh(!refresh);
       setStockToAdd(0);
       setVisible(false);
-      toast.current?.show({
+      mainToast.current?.show({
         severity: "success",
         summary: "¡Hecho!",
         detail: "Se ha añadido el stock correctamente",
@@ -136,7 +124,7 @@ function Items() {
           </div>
         </div>
       </Dialog>
-      <Toast ref={toast} />
+      <Toast ref={mainToast} />
       <div className="flex flex-row gap-2 justify-content-center">
         <DataTable
           header={header}
