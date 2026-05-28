@@ -130,7 +130,7 @@ def manage_withdrawals(request, pk=-1):
 
             return Response(
                 {"message": "Eliminado correctamente"},
-                status=status.HTTP_204_NO_CONTENT,
+                status=status.HTTP_200_OK,
             )
 
         except WithdrawalLine.DoesNotExist:
