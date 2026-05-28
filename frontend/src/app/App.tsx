@@ -5,8 +5,8 @@ import "primeicons/primeicons.css";
 import "../../node_modules/primeflex/primeflex.css";
 import Layout from "../layouts/MainLayout";
 import Index from "../features/main";
-import Withdrawals from "../features/withdrawals";
 import Items from "../features/items";
+import Withdrawals from "../features/withdrawals";
 
 function App() {
   return (

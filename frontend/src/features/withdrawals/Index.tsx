@@ -112,7 +112,6 @@ function Withdrawals() {
       try {
         const data = await getWithdrawals();
         setWithdrawals(data);
-        console.log(data);
       } catch (err) {
         console.error(err);
       }
