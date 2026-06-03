@@ -13,6 +13,21 @@ import NewWithdrawalPanel from "./components/NewWIthdrawalPanel";
 import { Toast } from "primereact/toast";
 import { deleteWithdrawalLine, getWithdrawals } from "../../api/api";
 
+interface WithdrawalLine {
+  id: number;
+  reference_code: string;
+  description: string;
+  quantity: number;
+  location: string;
+}
+
+interface Withdrawal {
+  id: number;
+  worker: string;
+  date: string;
+  lines: WithdrawalLine[];
+}
+
 function Withdrawals() {
   const [visible, setVisible] = useState<boolean>(false);
   const [withdrawals, setWithdrawals] = useState<DataTableValue[]>([]);
@@ -45,7 +60,91 @@ function Withdrawals() {
     </span>
   );
 
-  const actionTemplate = (rowData: DataTableValue) => {
+  const printSubRows = (rowData: Withdrawal): void => {
+    console.log(rowData);
+    const subRows: WithdrawalLine[] = rowData.lines || [];
+
+    if (subRows.length === 0) {
+      alert("Esta fila no tiene datos expandidos para imprimir.");
+      return;
+    }
+
+    // Abrir la ventana del navegador (puede retornar null si un bloqueador de popups actúa)
+    const printWindow = window.open("", "_blank", "width=800,height=800");
+
+    if (!printWindow) {
+      alert("Por favor, permite los pop-ups para poder imprimir los detalles.");
+      return;
+    }
+
+    // Construir el documento HTML estático
+    const htmlContent = `
+          <html>
+            <head>
+                <title>Imprimir Detalles - Salida nº ${rowData.id}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
+                    h2 { border-bottom: 2px solid #333; padding-bottom: 5px; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 25px; font-size: 13px; }
+                    th { border: 1px solid #ddd; padding: 10px; text-align: left; background-color: #f4f4f4;}
+                    td { border-left: 1px solid #ddd;; border-right solid #ddd;: 1px; padding: 10px; text-align: left; }
+                    tbody { border: 1px solid #ddd; }
+                </style>
+            </head>
+            <body>
+                <h2>Detalles Expandidos de salida nº ${rowData.id}</h2>
+                <p><strong>Empleado:</strong> <i>${rowData.worker}</i></p>
+                <p><strong>Fecha:</strong>  <i>${rowData.date}</i></p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Referencia</th>
+                            <th>Artículo</th>
+                            <th>Cantidad</th>
+                            <th>Ubicación</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${subRows
+                          .map(
+                            (item) => `
+                            <tr>
+                                <td>${item.reference_code}</td>
+                                <td>${item.description}</td>
+                                <td>${item.quantity}</td>
+                                <td>${item.location}</td>
+                            </tr>
+                        `,
+                          )
+                          .join("")}
+                    </tbody>
+                </table>
+                <script>
+                    window.onload = function() {
+                        window.print();
+                        window.close();
+                    }
+                </script>
+            </body>
+          </html>
+        `;
+
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+  };
+
+  const secondActionTemplate = (rowData: Withdrawal) => {
+    return (
+      <Button
+        icon="pi pi-print"
+        className="p-button-rounded p-button-text p-button-help"
+        tooltip="Imprimir subfilas"
+        onClick={() => printSubRows(rowData)}
+      />
+    );
+  };
+
+  const actionTemplate = (rowData: WithdrawalLine) => {
     return (
       <Button
         icon="pi pi-trash"
@@ -87,7 +186,7 @@ function Withdrawals() {
     }
   };
 
-  const rowExpansionTemplate = (data: DataTableValue) => {
+  const rowExpansionTemplate = (data: Withdrawal) => {
     return (
       <div>
         <DataTable
@@ -180,6 +279,7 @@ function Withdrawals() {
         <Column field="id" header="Código" />
         <Column field="worker" header="Técnico" />
         <Column field="date" header="Fecha" />
+        <Column body={secondActionTemplate} />
       </DataTable>
     </div>
   );
