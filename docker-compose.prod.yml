@@ -50,7 +50,8 @@ services:
       - static_volume:/usr/share/nginx/html/static:ro
     
     environment:
-      - VITE_API_TARGET=http://backend:8000
+      VITE_API_TARGET: "http://backend:8000"
+      VITE_APP_ENV: "development" 
     
     
     restart: always

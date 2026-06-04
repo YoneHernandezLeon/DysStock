@@ -3,6 +3,8 @@ import type { MenuItem } from "primereact/menuitem";
 import { useNavigate } from "react-router-dom";
 
 function Header() {
+  const isDevelopment = import.meta.env.VITE_APP_ENV === "development";
+
   const navigate = useNavigate();
   const items: MenuItem[] = [
     {
@@ -54,7 +56,11 @@ function Header() {
     <div className="w-full">
       <Menubar
         model={items}
-        className="text-sm h-3rem w-5 mx-auto justify-content-center bg-primary shadow-4"
+        className={
+          isDevelopment
+            ? "dev-env text-sm h-3rem w-5 mx-auto justify-content-center shadow-4"
+            : "text-sm h-3rem w-5 mx-auto justify-content-center shadow-4"
+        }
       />
     </div>
   );

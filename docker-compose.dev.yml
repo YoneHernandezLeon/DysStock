@@ -47,6 +47,7 @@ services:
     environment:
       CHOKIDAR_USEPOLLING: "true"
       VITE_API_TARGET: "http://backend-dev:8000"
+      VITE_APP_ENV: "development" 
       
     
     ports:

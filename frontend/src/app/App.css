@@ -290,10 +290,18 @@
   }
 }
 
-:root{
-  background-image: url('../assets/dysteca.jpg');
+.dev-env {
+  background-color: rgb(209, 241, 241);
   background-repeat: no-repeat;
   background-size: 80%;
   background-position: center;
   background-attachment: fixed;
+}
+
+:root{
+    background-image: url('../assets/dysteca.jpg');
+    background-repeat: no-repeat;
+    background-size: 80%;
+    background-position: center;
+    background-attachment: fixed;
 }
