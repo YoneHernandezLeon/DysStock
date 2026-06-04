@@ -4,7 +4,9 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm ci
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
+RUN npm ci --no-audit --no-fund
 
 COPY . .
 
