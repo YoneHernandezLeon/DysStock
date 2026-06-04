@@ -7,6 +7,7 @@ import Layout from "../layouts/MainLayout";
 import Index from "../features/main";
 import Items from "../features/items";
 import Withdrawals from "../features/withdrawals";
+import Reports from "../features/reports";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
               <Route index element={<Index />} />
               <Route path="withdraw/" element={<Withdrawals />} />
               <Route path="items/" element={<Items />} />
+              <Route path="reports/" element={<Reports />} />
             </Route>
           </Routes>
         </BrowserRouter>
