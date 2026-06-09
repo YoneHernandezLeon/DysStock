@@ -1,3 +1,8 @@
+from itertools import groupby
+from operator import itemgetter
+
+from django.http import FileResponse
+import pandas as pd
 from django.shortcuts import render
 from django.db.models import F
 from rest_framework.decorators import api_view
@@ -7,6 +12,7 @@ from .models import Withdrawal, WithdrawalLine, Item, Worker
 from .serializers import (
     AddStockToItemSerializer,
     AddWithdrawalSerializer,
+    LocationSerializer,
     WithdrawalSerializer,
     WorkerSerializer,
     ItemSerializer,
@@ -159,11 +165,36 @@ def get_items(request):
         "stock",
         "safety_stock",
         "observations",
-    )
+    ).order_by("reference_code")
 
     serializer = ItemSerializer(items, many=True)
 
     return Response(serializer.data)
+
+
+@api_view(["GET"])
+def generate_xlsx_by_reference(request):
+    items = list(Item.objects.values(
+        "reference_code",
+        "description",
+        "location__code",
+        "stock"
+    ).order_by(
+        "reference_code"
+    ).annotate(
+        Referencia=F('reference_code'),
+        Artículo=F('description'),
+        Ubicación=F('location__code'),
+        Stock=F('stock')
+    ))
+
+    df = pd.DataFrame(items, columns=["Referencia", "Artículo", "Ubicación", "Stock"])
+    
+    df.to_excel("generated_files/articulos_por_referencia.xlsx", index=False)
+    
+    response = FileResponse(open("generated_files/articulos_por_referencia.xlsx", 'rb'), as_attachment=True)
+    response['Content-Disposition'] = 'attachment; filename="articulos_por_referencia.xlsx"'
+    return response
 
 
 @api_view(["POST"])
@@ -195,8 +226,71 @@ def get_items_under_safety(request):
         "stock",
         "safety_stock",
         "observations",
-    )
+    ).order_by("reference_code")
 
     serializer = ItemSerializer(items, many=True)
+
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def generate_xlsx_by_safety_stock(request):
+    items = list(Item.objects.filter(
+        stock__lte=F("safety_stock"),
+        safety_warning=True
+    ).values(
+        "reference_code",
+        "description",
+        "location__code",
+        "stock",
+        "safety_stock"
+    ).order_by(
+        "reference_code"
+    ).annotate(
+        Referencia=F('reference_code'),
+        Artículo=F('description'),
+        Ubicación=F('location__code'),
+        Stock=F('stock'),
+        Mínimo=F('safety_stock')
+    ))
+
+    df = pd.DataFrame(items, columns=["Referencia", "Artículo", "Ubicación", "Stock", "Mínimo"])
+    
+    df.to_excel("generated_files/articulos_bajo_minimos.xlsx", index=False)
+    
+    response = FileResponse(open("generated_files/articulos_bajo_minimos.xlsx", 'rb'), as_attachment=True)
+    response['Content-Disposition'] = 'attachment; filename="articulos_bajo_minimos.xlsx"'
+    return response
+
+@api_view(["GET"])
+def get_items_by_location(request):
+    items = Item.objects.values(
+        "id",
+        "reference_code",
+        "location__code",
+        "description",
+        "stock",
+        "safety_stock",
+        "observations",
+    ).order_by(
+        "location__code",
+        "reference_code"
+    )
+    
+    resultado = []
+    for location_code, grupo in groupby(items, key=itemgetter("location__code")):
+        resultado.append({
+            "location": location_code,
+            "items": [
+                {
+                    "reference_code": item["reference_code"],
+                    "description": item["description"], # Corregido el typo de 'descritpion'
+                    "stock": item["stock"]
+                }
+                for item in grupo
+            ]
+        })
+
+    serializer = LocationSerializer(resultado, many=True)
 
     return Response(serializer.data)

@@ -54,3 +54,14 @@ class AddWithdrawalSerializer(serializers.Serializer):
 class AddStockToItemSerializer(serializers.Serializer):
     reference_code = serializers.CharField()
     stock = serializers.IntegerField()
+
+
+class ItemByLocationSerializer(serializers.Serializer):
+    reference_code = serializers.CharField()
+    description = serializers.CharField()
+    stock = serializers.IntegerField()
+
+
+class LocationSerializer(serializers.Serializer):
+    location = serializers.CharField()
+    items = ItemByLocationSerializer(many=True)

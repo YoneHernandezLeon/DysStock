@@ -35,3 +35,14 @@ export interface StockIncrease {
   reference_code: string;
   stock: number;
 }
+
+export interface ItemsByLocation {
+  location: string;
+  items: ItemByLocation[];
+}
+
+export interface ItemByLocation {
+  reference_code: string;
+  description: string;
+  stock: number;
+}

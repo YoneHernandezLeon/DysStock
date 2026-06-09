@@ -23,8 +23,27 @@ export const getItems = async () => {
   return response.data;
 };
 
+export const getXlsxByReferenceCode = async () => {
+  const response = await axios.get(`${BASE_URL}items/xlsx-ref`, {
+    responseType: "blob",
+  });
+  return response.data;
+};
+
+export const getItemsByLocation = async () => {
+  const response = await axios.get(`${BASE_URL}items/location/`);
+  return response.data;
+};
+
 export const getItemsUnderSafety = async () => {
   const response = await axios.get(`${BASE_URL}items/safety/`);
+  return response.data;
+};
+
+export const getXlsxBySafetyStock = async () => {
+  const response = await axios.get(`${BASE_URL}items/xlsx-saf`, {
+    responseType: "blob",
+  });
   return response.data;
 };
 
