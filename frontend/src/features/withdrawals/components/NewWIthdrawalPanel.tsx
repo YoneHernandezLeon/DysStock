@@ -225,7 +225,7 @@ function NewWithdrawalPanel(props: Props) {
             virtualScrollerOptions={{ itemSize: 38 }}
             filter
           />
-          <label htmlFor="dd-item">Artículo</label>
+          <label htmlFor="dd-item">Referencia</label>
         </FloatLabel>
         <FloatLabel className="flex flex-grow-1">
           <InputText
