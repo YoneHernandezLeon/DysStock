@@ -86,6 +86,13 @@ function Header() {
       },
     },
     {
+      label: "Gráficos",
+      icon: "pi pi-chart-bar",
+      command: () => {
+        window.location.href = "/graphs/";
+      },
+    },
+    {
       label: "Administración",
       icon: "pi pi-clock",
       command: () => {

@@ -8,6 +8,7 @@ import Index from "../features/main";
 import Items from "../features/items";
 import Withdrawals from "../features/withdrawals";
 import Reports from "../features/reports";
+import Graphs from "../features/graphs";
 
 function App() {
   addLocale("es", {
@@ -95,6 +96,7 @@ function App() {
               <Route path="withdraw/" element={<Withdrawals />} />
               <Route path="items/" element={<Items />} />
               <Route path="reports/" element={<Reports />} />
+              <Route path="graphs/" element={<Graphs />} />
             </Route>
           </Routes>
         </BrowserRouter>

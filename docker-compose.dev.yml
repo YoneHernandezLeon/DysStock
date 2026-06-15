@@ -19,19 +19,14 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.dev
-    
     environment:
       CHOKIDAR_USEPOLLING: "true"
-
     volumes:
       - ./backend:/app
-
     env_file:
       - .env.dev
-    
     ports:
       - "8000:8000"
-    
     depends_on:
       mysql-dev:
         condition: service_healthy
@@ -40,22 +35,41 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
-    
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    
     environment:
       CHOKIDAR_USEPOLLING: "true"
       VITE_API_TARGET: "http://backend-dev:8000"
       VITE_APP_ENV: "development" 
-      
-    
     ports:
       - "5173:5173"
-    
     depends_on:
       - backend-dev
 
+  grafana-dev:
+    image: grafana/grafana-enterprise
+    container_name: grafana-dev
+    restart: unless-stopped
+    environment:
+      - GF_SERVER_ROOT_URL=http://my.grafana.server/
+      - GF_PLUGINS_PREINSTALL=grafana-clock-panel
+      - GF_USERS_DEFAULT_LANGUAGE=es-ES
+      - GF_DATE_FORMATS_USE_BROWSER_LOCALE=true
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+      - GF_PANELS_DISABLE_SANITIZE_HTML=true
+      - GF_SECURITY_COOKIE_SAMESITE=lax
+      - GF_SECURITY_COOKIE_SECURE=false
+    ports:
+      - '3000:3000'
+    volumes:
+      - 'grafana_storage:/var/lib/grafana'
+    depends_on:
+      mysql-dev:
+        condition: service_healthy
+
 volumes:
   mysql-dev_data:
+  grafana_storage:

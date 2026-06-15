@@ -57,6 +57,29 @@ services:
     
     restart: always
 
+  grafana:
+    image: grafana/grafana-enterprise
+    container_name: grafana
+    restart: unless-stopped
+    environment:
+      - GF_SERVER_ROOT_URL=http://my.grafana.server/
+      - GF_PLUGINS_PREINSTALL=grafana-clock-panel
+      - GF_USERS_DEFAULT_LANGUAGE=es-ES
+      - GF_DATE_FORMATS_USE_BROWSER_LOCALE=true
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+      - GF_PANELS_DISABLE_SANITIZE_HTML=true
+      - GF_SECURITY_COOKIE_SAMESITE=lax
+      - GF_SECURITY_COOKIE_SECURE=false
+    ports:
+      - '3000:3000'
+    volumes:
+      - 'grafana_storage:/var/lib/grafana'
+    depends_on:
+      mysql-dev:
+        condition: service_healthy
+
 volumes:
   mysql_prod_data:
   static_volume: 
