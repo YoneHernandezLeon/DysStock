@@ -83,3 +83,4 @@ services:
 volumes:
   mysql_prod_data:
   static_volume: 
+  grafana_storage:
