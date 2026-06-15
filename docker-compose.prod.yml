@@ -77,7 +77,7 @@ services:
     volumes:
       - 'grafana_storage:/var/lib/grafana'
     depends_on:
-      mysql-dev:
+      mysql:
         condition: service_healthy
 
 volumes:
