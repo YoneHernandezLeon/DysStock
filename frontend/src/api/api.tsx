@@ -3,6 +3,10 @@ import type { StockIncrease, Withdrawal } from "../types/withdrawals";
 
 const BASE_URL = "/api/";
 
+axios.defaults.withCredentials = true;
+axios.defaults.xsrfCookieName = "csrftoken";
+axios.defaults.xsrfHeaderName = "X-CSRFToken";
+
 export const getWithdrawals = async () => {
   const response = await axios.get(`${BASE_URL}withdrawals/`);
   return response.data;
