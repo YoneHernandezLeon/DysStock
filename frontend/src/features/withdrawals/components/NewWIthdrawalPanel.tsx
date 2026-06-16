@@ -6,11 +6,17 @@ import { Dropdown, type DropdownChangeEvent } from "primereact/dropdown";
 import { FloatLabel } from "primereact/floatlabel";
 import {
   InputNumber,
-  type InputNumberValueChangeEvent,
+  type InputNumberChangeEvent,
 } from "primereact/inputnumber";
 import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type FocusEvent,
+} from "react";
 import { createWithdrawal, getItems, getWorkers } from "../../../api/api";
 import type {
   Item,
@@ -37,12 +43,23 @@ function NewWithdrawalPanel(props: Props) {
   const [selectedWorker, setSelectedWorker] = useState<Worker | null>(null);
   const [withdrawalList, setWithdrawalList] = useState<SelectedItem[]>([]);
 
+  const inputNumberRef = useRef<InputNumber>(null);
+  const inputDropdowRef = useRef<Dropdown>(null);
+
   const workerOptionTemplate = (option: Worker) => {
     return (
       <span>
         {option.code} - {option.name}
       </span>
     );
+  };
+
+  const selectedWorkerTemplate = (option: Worker | null) => {
+    if (option) {
+      // Forzamos que solo se pinte el nombre, ocultando el código del input
+      return <span>{option.name}</span>;
+    }
+    return <span>Selecciona Trabajador</span>;
   };
 
   useEffect(() => {
@@ -100,7 +117,7 @@ function NewWithdrawalPanel(props: Props) {
     setDisabledAddButton(true);
   };
 
-  const checkStock = (e: InputNumberValueChangeEvent) => {
+  const checkStock = (e: InputNumberChangeEvent) => {
     if (e.value) {
       setQuantity(e.value);
       if (e.value > actualStock || e.value == 0) {
@@ -193,6 +210,34 @@ function NewWithdrawalPanel(props: Props) {
     }
   };
 
+  const handleDropdownKeyDown = (e: KeyboardEvent<HTMLSpanElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+
+      if (inputNumberRef.current) {
+        inputNumberRef.current.focus();
+      }
+    }
+  };
+
+  const handleNumberKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+
+      if (!disabledAddButton) {
+        addItem();
+
+        if (inputDropdowRef.current) {
+          inputDropdowRef.current.focus();
+        }
+      }
+    }
+  };
+
+  const handleFocus = (e: FocusEvent<HTMLInputElement>) => {
+    e.target.select();
+  };
+
   return (
     <div className="flex flex-column">
       <div className="p-inputgroup flex-1 my-2">
@@ -204,9 +249,10 @@ function NewWithdrawalPanel(props: Props) {
             inputId="dd-worker"
             value={selectedWorker}
             itemTemplate={workerOptionTemplate}
+            valueTemplate={selectedWorkerTemplate}
             onChange={(e) => selectWorker(e)}
             options={workers}
-            optionLabel="name"
+            optionLabel="code"
             className="w-full md:w-14rem"
           />
           <label htmlFor="dd-worker">Empleado</label>
@@ -216,6 +262,7 @@ function NewWithdrawalPanel(props: Props) {
         <FloatLabel>
           <Dropdown
             inputId="dd-item"
+            ref={inputDropdowRef}
             value={selectedItem}
             disabled={disabledArticleSelector}
             onChange={(e) => selectItem(e)}
@@ -224,6 +271,9 @@ function NewWithdrawalPanel(props: Props) {
             className="w-full md:w-14rem h-full"
             virtualScrollerOptions={{ itemSize: 38 }}
             filter
+            editable
+            onKeyDown={handleDropdownKeyDown}
+            onFocus={handleFocus}
           />
           <label htmlFor="dd-item">Referencia</label>
         </FloatLabel>
@@ -238,11 +288,14 @@ function NewWithdrawalPanel(props: Props) {
         </FloatLabel>
         <FloatLabel className="p-inputgroup flex-1 flex">
           <InputNumber
+            ref={inputNumberRef}
             invalid={invalidQuantity}
             disabled={disabledQuantitySelector}
             inputId="in-quantity"
             value={quantity}
-            onValueChange={(e) => checkStock(e)}
+            onChange={(e) => checkStock(e)}
+            onKeyDown={handleNumberKeyDown}
+            onFocus={handleFocus}
           ></InputNumber>
           <label htmlFor="in-quantity">Cantidad</label>
           <Tag severity="contrast" className="border-round-right-sm">
@@ -250,6 +303,7 @@ function NewWithdrawalPanel(props: Props) {
           </Tag>
         </FloatLabel>
         <Button
+          id="add-item-btn"
           icon="pi pi-plus"
           className="my-1"
           size="small"
