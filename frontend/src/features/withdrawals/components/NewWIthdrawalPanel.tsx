@@ -296,6 +296,7 @@ function NewWithdrawalPanel(props: Props) {
             onChange={(e) => checkStock(e)}
             onKeyDown={handleNumberKeyDown}
             onFocus={handleFocus}
+            min={0}
           ></InputNumber>
           <label htmlFor="in-quantity">Cantidad</label>
           <Tag severity="contrast" className="border-round-right-sm">
