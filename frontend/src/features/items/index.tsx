@@ -145,6 +145,8 @@ function Items() {
           rowsPerPageOptions={[50, 100, 200]}
           size="small"
           scrollable
+          resizableColumns
+          columnResizeMode="expand"
           scrollHeight="41rem"
           editMode="row"
           tableStyle={{ minWidth: "85rem" }}
