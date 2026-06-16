@@ -53,8 +53,7 @@ services:
     environment:
       VITE_API_TARGET: "http://backend:8000"
       VITE_APP_ENV: "development" 
-    
-    
+      VITE_GRAFANA_URL: "http://192.168.3.215:3000"
     restart: always
 
   grafana:

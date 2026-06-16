@@ -1,6 +1,7 @@
 function Graphs() {
-  const grafanaUrl =
-    "http://localhost:3000/d/ad5wcsr/cantidad-de-salidas-cada-mes?orgId=1&from=now-1y&to=now&timezone=browser&var-reference_code=ACT9R70200&kiosk";
+  const baseUrl = import.meta.env.VITE_GRAFANA_URL || "http://localhost:3000";
+
+  const grafanaUrl = `${baseUrl}/d/ad5wcsr/cantidad-de-salidas-cada-mes?orgId=1&from=now-1y&to=now&timezone=browser&var-reference_code=ACT9R70200&kiosk`;
 
   return (
     <div
