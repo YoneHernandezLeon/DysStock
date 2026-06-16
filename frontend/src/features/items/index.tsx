@@ -1,5 +1,5 @@
 import { Dialog } from "primereact/dialog";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { Toast } from "primereact/toast";
 import { getItems, updateStock } from "../../api/api";
 import type { Item } from "../../types/withdrawals";
@@ -87,6 +87,13 @@ function Items() {
     }
   };
 
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addStock();
+    }
+  };
+
   return (
     <div className="basic-panel items">
       <Dialog
@@ -110,8 +117,9 @@ function Items() {
               <InputNumber
                 id="in-stock-to-add"
                 value={stockToAdd}
-                onValueChange={(e) => setStockToAdd(e.value as number)}
+                onChange={(e) => setStockToAdd(e.value as number)}
                 min={0}
+                onKeyDown={handleKeyDown}
               />
               <label htmlFor="in-stock-to-add">Unidades</label>
             </FloatLabel>
